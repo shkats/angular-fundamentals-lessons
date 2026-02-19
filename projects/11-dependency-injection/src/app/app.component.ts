@@ -1,10 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, inject, Injectable, OnInit } from '@angular/core';
+import { UserService } from './user.service';
+import { User } from './data';
+import { UserInfoComponent } from "./user-info/user-info.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  template: ` <h1>User Listing</h1> `,
+  imports:[UserInfoComponent],
+  template: ` <h1>User Listing</h1>
+  @for (user of userData; track user.id){
+    <app-user-info [user]="user"></app-user-info>
+  }
+  `,
 })
-export class AppComponent {
-  constructor() {}
+export class AppComponent implements OnInit {
+  userService = inject(UserService); //singleton - shared in app, copy use component level and pass to children
+  userData: User[] = [];
+
+  async ngOnInit(): Promise<void> {
+    const data = await this.userService.getUserData();
+    this.userData = data;
+    
+  }
 }
